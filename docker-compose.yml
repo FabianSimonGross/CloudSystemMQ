@@ -1,0 +1,77 @@
+x-app-env: &app-env
+  SQL_URL: jdbc:postgresql://postgres:5432/cloudsystem
+  SQL_USERNAME: clouduser
+  SQL_PASSWORD: secret
+  ACTIVEMQ_BROKER_URL: tcp://activemq:61616
+  ACTIVEMQ_USER: admin
+  ACTIVEMQ_PASSWORD: admin
+  MASTER_URL: http://master:8080
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    volumes:
+      - ./postgres:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: cloudsystem
+      POSTGRES_USER: clouduser
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+
+  activemq:
+    image: apache/activemq-classic:5.18.3
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: admin
+      ACTIVEMQ_ADMIN_PASSWORD: admin
+    restart: unless-stopped
+
+  master:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - activemq
+    environment:
+      <<: *app-env
+      MODE: master
+    ports:
+      - "8080:8080"
+
+  node1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      MODE: node
+    depends_on:
+      - master
+      - activemq
+    volumes:
+      - ./templates:/app/templates
+    ports:
+      - "30000-31000:30000-31000"
+
+  node2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      MODE: node
+    depends_on:
+      - master
+      - activemq
+    volumes:
+      - ./templates:/app/templates
+    ports:
+      - "40000-41000:30000-31000"
+
+volumes:
+  postgres:
