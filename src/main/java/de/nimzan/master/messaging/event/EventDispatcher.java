@@ -104,7 +104,12 @@ public class EventDispatcher {
                   TODO:
                   Store Server in DB
                  */
-                log.info("Server started: {}", serverStarted);
+                NodeEntity node = nodeRepo.findById(serverStarted.nodeId()).orElse(null);
+
+                if (node == null) {
+                    log.warn("Received server.start event for unknown node {}, ignoring", serverStarted.nodeId());
+                    break;
+                }
 
                 ServerEntity server = new ServerEntity();
                 server.setUuid(serverStarted.serverId());
@@ -112,12 +117,10 @@ public class EventDispatcher {
                 server.setIp(serverStarted.nodeIp());
                 server.setTemplate(serverStarted.template());
                 server.setStatus(serverStarted.status());
-
-                NodeEntity node = nodeRepo.findById(serverStarted.nodeId()).orElse(null);
-
                 server.setNode(node);
 
                 serverRepo.save(server);
+                log.info("Server started: {}", serverStarted);
             }
             case Event.ServerStopped serverStopped -> {
                 /*

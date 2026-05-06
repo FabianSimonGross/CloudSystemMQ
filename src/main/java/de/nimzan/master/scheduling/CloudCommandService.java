@@ -20,7 +20,7 @@ public class CloudCommandService {
 
     private final MasterCommandProducer producer;
 
-    public CloudCommandService(MasterCommandProducer producer) throws JMSException {
+    public CloudCommandService(MasterCommandProducer producer) {
         this.producer = producer;
     }
 
