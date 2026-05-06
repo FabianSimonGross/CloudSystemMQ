@@ -40,8 +40,6 @@ public class EventDispatcher {
         final LongAdder count = new LongAdder();
     }
 
-    public EventDispatcher() throws JMSException {}
-
     public void dispatch(Event event) throws JMSException {
         switch (event) {
             case Event.NodeHeartbeat heartbeat -> {

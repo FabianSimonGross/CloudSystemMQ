@@ -41,8 +41,6 @@ public class CloudScheduler {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(CloudScheduler.class);
 
-    public CloudScheduler() throws JMSException {}
-
     @Scheduled(fixedDelay = 2000)
     @Transactional
     public void reconcile() {

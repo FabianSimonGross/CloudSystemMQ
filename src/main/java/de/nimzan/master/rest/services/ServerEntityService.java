@@ -24,9 +24,6 @@ public class ServerEntityService {
     @Autowired
     private CloudCommandService cloudCommandService;
 
-    public ServerEntityService() throws JMSException {
-    }
-
     public List<ServerEntity> getAll() {
         return serverEntityRepository.findAll();
     }
